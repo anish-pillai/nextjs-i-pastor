@@ -7,8 +7,8 @@ import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://chat.vercel.ai'),
-  title: 'Next.js Chatbot Template',
-  description: 'Next.js chatbot template using the AI SDK.',
+  title: 'iPastor - Your Pastor',
+  description: 'Ask any burning question you have about Christianity',
 };
 
 export const viewport = {
@@ -42,7 +42,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang='en'
       // `next-themes` injects an extra classname to the body element to avoid
       // visual flicker before hydration. Hence the `suppressHydrationWarning`
       // prop is necessary to avoid the React hydration mismatch warning.
@@ -56,14 +56,14 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased">
+      <body className='antialiased'>
         <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
+          attribute='class'
+          defaultTheme='system'
           enableSystem
           disableTransitionOnChange
         >
-          <Toaster position="top-center" />
+          <Toaster position='top-center' />
           {children}
         </ThemeProvider>
       </body>
