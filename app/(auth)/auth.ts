@@ -1,14 +1,8 @@
-import { compare } from 'bcrypt-ts';
-import NextAuth, { type User, type Session } from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-
-import { getUser } from '@/lib/db/queries';
-
-import { authConfig } from './auth.config';
-
-interface ExtendedSession extends Session {
-  user: User;
-}
+import NextAuth from 'next-auth';
+import { DrizzleAdapter } from '@auth/drizzle-adapter';
+import github from 'next-auth/providers/github';
+import google from 'next-auth/providers/google';
+import { db } from '@/lib/db';
 
 export const {
   handlers: { GET, POST },
@@ -16,40 +10,50 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  ...authConfig,
+  session: { strategy: 'jwt' },
+  adapter: DrizzleAdapter(db),
+  pages: {
+    signIn: '/login',
+  },
   providers: [
-    Credentials({
-      credentials: {},
-      async authorize({ email, password }: any) {
-        const users = await getUser(email);
-        if (users.length === 0) return null;
-        // biome-ignore lint: Forbidden non-null assertion.
-        const passwordsMatch = await compare(password, users[0].password!);
-        if (!passwordsMatch) return null;
-        return users[0] as any;
-      },
-    }),
+    github({ allowDangerousEmailAccountLinking: true }),
+    google({ allowDangerousEmailAccountLinking: true }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
+    authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user;
+      const paths = ['/profile', '/client-side', '/api/session'];
+      const isProtected = paths.some((path) =>
+        nextUrl.pathname.startsWith(path)
+      );
 
+      if (isProtected && !isLoggedIn) {
+        const redirectUrl = new URL('/login', nextUrl.origin);
+        redirectUrl.searchParams.append('callbackUrl', nextUrl.href);
+        return Response.redirect(redirectUrl);
+      }
+      return true;
+    },
+    jwt: ({ token, user }) => {
+      if (user) {
+        const u = user as unknown as any;
+        return {
+          ...token,
+          id: u.id,
+          randomKey: u.randomKey,
+        };
+      }
       return token;
     },
-    async session({
-      session,
-      token,
-    }: {
-      session: ExtendedSession;
-      token: any;
-    }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-      }
-
-      return session;
+    session(params) {
+      return {
+        ...params.session,
+        user: {
+          ...params.session.user,
+          id: params.token.id as string,
+          randomKey: params.token.randomKey,
+        },
+      };
     },
   },
 });

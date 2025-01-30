@@ -1,12 +1,11 @@
 import 'server-only';
 
-import { genSaltSync, hashSync } from 'bcrypt-ts';
 import { and, asc, desc, eq, gt, gte } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
 import {
-  user,
+  users as user,
   chat,
   type User,
   document,
@@ -23,7 +22,7 @@ import { BlockKind } from '@/components/block';
 // https://authjs.dev/reference/adapter/drizzle
 
 // biome-ignore lint: Forbidden non-null assertion.
-const client = postgres(process.env.POSTGRES_URL!);
+const client = postgres(process.env.DATABASE_URL!);
 const db = drizzle(client);
 
 export async function getUser(email: string): Promise<Array<User>> {
@@ -31,18 +30,6 @@ export async function getUser(email: string): Promise<Array<User>> {
     return await db.select().from(user).where(eq(user.email, email));
   } catch (error) {
     console.error('Failed to get user from database');
-    throw error;
-  }
-}
-
-export async function createUser(email: string, password: string) {
-  const salt = genSaltSync(10);
-  const hash = hashSync(password, salt);
-
-  try {
-    return await db.insert(user).values({ email, password: hash });
-  } catch (error) {
-    console.error('Failed to create user in database');
     throw error;
   }
 }
@@ -238,8 +225,8 @@ export async function deleteDocumentsByIdAfterTimestamp({
       .where(
         and(
           eq(suggestion.documentId, id),
-          gt(suggestion.documentCreatedAt, timestamp),
-        ),
+          gt(suggestion.documentCreatedAt, timestamp)
+        )
       );
 
     return await db
@@ -247,7 +234,7 @@ export async function deleteDocumentsByIdAfterTimestamp({
       .where(and(eq(document.id, id), gt(document.createdAt, timestamp)));
   } catch (error) {
     console.error(
-      'Failed to delete documents by id after timestamp from database',
+      'Failed to delete documents by id after timestamp from database'
     );
     throw error;
   }
@@ -278,7 +265,7 @@ export async function getSuggestionsByDocumentId({
       .where(and(eq(suggestion.documentId, documentId)));
   } catch (error) {
     console.error(
-      'Failed to get suggestions by document version from database',
+      'Failed to get suggestions by document version from database'
     );
     throw error;
   }
@@ -304,11 +291,11 @@ export async function deleteMessagesByChatIdAfterTimestamp({
     return await db
       .delete(message)
       .where(
-        and(eq(message.chatId, chatId), gte(message.createdAt, timestamp)),
+        and(eq(message.chatId, chatId), gte(message.createdAt, timestamp))
       );
   } catch (error) {
     console.error(
-      'Failed to delete messages by id after timestamp from database',
+      'Failed to delete messages by id after timestamp from database'
     );
     throw error;
   }
