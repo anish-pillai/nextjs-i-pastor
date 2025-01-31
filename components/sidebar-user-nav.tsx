@@ -20,30 +20,44 @@ import {
 
 export function SidebarUserNav({ user }: { user: User }) {
   const { setTheme, theme } = useTheme();
-
+  console.log('user', user);
+  /**
+   * email
+: 
+"anishpillaimca@gmail.com"
+id
+: 
+"7fea4038-c06c-4a06-b0f1-5edb29e9b5c4"
+image
+: 
+"https://avatars.githubusercontent.com/u/57839415?v=4"
+name
+: 
+"Anish K Pillai"*/
+  const { image, name } = user;
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent bg-background data-[state=open]:text-sidebar-accent-foreground h-10">
+            <SidebarMenuButton className='data-[state=open]:bg-sidebar-accent bg-background data-[state=open]:text-sidebar-accent-foreground h-10'>
               <Image
-                src={`https://avatar.vercel.sh/${user.email}`}
+                src={image ?? '/default-avatar.png'}
                 alt={user.email ?? 'User Avatar'}
                 width={24}
                 height={24}
-                className="rounded-full"
+                className='rounded-full'
               />
-              <span className="truncate">{user?.email}</span>
-              <ChevronUp className="ml-auto" />
+              <span className='truncate'>{name}</span>
+              <ChevronUp className='ml-auto' />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            side="top"
-            className="w-[--radix-popper-anchor-width]"
+            side='top'
+            className='w-[--radix-popper-anchor-width]'
           >
             <DropdownMenuItem
-              className="cursor-pointer"
+              className='cursor-pointer'
               onSelect={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             >
               {`Toggle ${theme === 'light' ? 'dark' : 'light'} mode`}
@@ -51,8 +65,8 @@ export function SidebarUserNav({ user }: { user: User }) {
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <button
-                type="button"
-                className="w-full cursor-pointer"
+                type='button'
+                className='w-full cursor-pointer'
                 onClick={() => {
                   signOut({
                     redirectTo: '/',
