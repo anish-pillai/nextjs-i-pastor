@@ -10,14 +10,32 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
+  secret: process.env.AUTH_SECRET!,
   session: { strategy: 'jwt' },
+  cookies: {
+    sessionToken: {
+      name: `authjs.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax', // Or 'none' if you use HTTPS
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   adapter: DrizzleAdapter(db),
   pages: {
     signIn: '/login',
+    newUser: '/',
   },
   providers: [
-    github({ allowDangerousEmailAccountLinking: true }),
-    google({ allowDangerousEmailAccountLinking: true }),
+    github({
+      clientId: process.env.AUTH_GITHUB_ID!,
+      clientSecret: process.env.AUTH_GITHUB_SECRET!,
+    }),
+    google({
+      clientId: process.env.AUTH_GOOGLE_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+    }),
   ],
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
