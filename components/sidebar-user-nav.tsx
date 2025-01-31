@@ -20,20 +20,6 @@ import {
 
 export function SidebarUserNav({ user }: { user: User }) {
   const { setTheme, theme } = useTheme();
-  console.log('user', user);
-  /**
-   * email
-: 
-"anishpillaimca@gmail.com"
-id
-: 
-"7fea4038-c06c-4a06-b0f1-5edb29e9b5c4"
-image
-: 
-"https://avatars.githubusercontent.com/u/57839415?v=4"
-name
-: 
-"Anish K Pillai"*/
   const { image, name } = user;
   return (
     <SidebarMenu>
