@@ -1,3 +1,8 @@
+
+## Followed this for implementing Drizzle ORM with NextAuth
+
+https://codevoweb.com/setting-up-drizzle-orm-with-nextauth-in-nextjs-14/#google_vignette
+
 <a href="https://chat.vercel.ai/">
   <img alt="Next.js 14 and App Router-ready AI chatbot." src="app/(chat)/opengraph-image.png">
   <h1 align="center">Next.js AI Chatbot</h1>

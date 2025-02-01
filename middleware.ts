@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export async function middleware(req: Request) {
+export async function middleware(req: NextRequest) {
   const cookies = req.headers.get('cookie');
   const { pathname } = new URL(req.url);
 
@@ -10,6 +11,14 @@ export async function middleware(req: Request) {
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon.ico')
+  ) {
+    return NextResponse.next();
+  }
+
+  // Example: Allow all image requests
+  if (
+    req.nextUrl.pathname.startsWith('/images') ||
+    req.nextUrl.pathname.startsWith('/fonts')
   ) {
     return NextResponse.next();
   }
